@@ -1,0 +1,21 @@
+{
+  "name": "aether-vanguard",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "shared",
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "dev:server": "npm run dev -w server",
+    "dev:client": "npm run dev -w client",
+    "dev": "concurrently -n SERVER,CLIENT -c blue,yellow \"npm run dev:server\" \"npm run dev:client\"",
+    "build:server": "npm run build -w server",
+    "build:client": "npm run build -w client"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "typescript": "^5.5.4"
+  }
+}

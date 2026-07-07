@@ -1,0 +1,6 @@
+{
+  "name": "@aether-vanguard/shared",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Codice puro condiviso tra client e server. Nessuna dipendenza runtime: consumato via path alias (@shared/*) sia da Vite che da tsx, senza step di build separato."
+}
