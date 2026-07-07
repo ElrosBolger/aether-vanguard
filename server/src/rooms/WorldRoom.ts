@@ -5,14 +5,11 @@ import {
   FIXED_DT,
   simulateStep,
   type InputPacket,
-  type StaticObstacle,
 } from '@shared/movementSimulation';
+import { STARTING_ZONE_OBSTACLES } from '@shared/mapConfig';
 import type { SessionTokenPayload } from '@shared/authTypes';
 
-const MAP_OBSTACLES: StaticObstacle[] = [
-  { x: 5, y: 5, width: 2, height: 2 },
-  { x: 10, y: 3, width: 1.5, height: 4 },
-];
+const MAP_OBSTACLES = STARTING_ZONE_OBSTACLES;
 
 const MAX_INPUTS_PER_TICK = 3;
 const MAX_PENDING_QUEUE = 30;
