@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ensureAccessToken, AuthError } from './api/auth';
+import { ensureAccessToken, getStoredTestToken, loginForTesting, AuthError } from './api/auth';
 import { GameNetworkClient, type ConnectionStatus } from './network/GameNetworkClient';
 import type { Vec2 } from '@shared/movementSimulation';
 
@@ -31,10 +31,19 @@ function useKeyboardInputVector() {
   };
 }
 
+async function getTestAccessToken(): Promise<string> {
+  const cached = getStoredTestToken();
+  if (cached) return cached;
+  const suggested = `Tester${Math.floor(Math.random() * 1000)}`;
+  const username = window.prompt('Dev login — nome player di test:', suggested) || suggested;
+  return loginForTesting(username);
+}
+
 export default function App() {
   const [status, setStatus] = useState<ConnectionStatus>('idle');
   const [error, setError] = useState<string | null>(null);
   const [localPos, setLocalPos] = useState<Vec2>({ x: 0, y: 0 });
+  const [remotePositions, setRemotePositions] = useState<Record<string, Vec2>>({});
 
   const getInputVector = useKeyboardInputVector();
   const networkRef = useRef<GameNetworkClient | null>(null);
@@ -46,7 +55,9 @@ export default function App() {
 
     async function bootstrap() {
       try {
-        const accessToken = await ensureAccessToken();
+        const accessToken = import.meta.env.DEV
+          ? await getTestAccessToken()
+          : await ensureAccessToken();
         if (cancelled) return;
 
         const network = new GameNetworkClient(COLYSEUS_URL, getInputVector, {
@@ -62,8 +73,16 @@ export default function App() {
           lastTime = now;
 
           network.update(delta);
+
           const pos = network.getLocalRenderPosition();
           if (pos) setLocalPos(pos);
+
+          const remotes: Record<string, Vec2> = {};
+          for (const sessionId of network.getRemoteSessionIds()) {
+            const remotePos = network.getRemoteRenderPosition(sessionId);
+            if (remotePos) remotes[sessionId] = remotePos;
+          }
+          setRemotePositions(remotes);
 
           rafId = requestAnimationFrame(loop);
         };
@@ -94,20 +113,34 @@ export default function App() {
       style={{
         background: '#0A0A0A',
         color: '#D4AF37',
-        height: '100vh',
+        minHeight: '100vh',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
         fontFamily: 'system-ui, sans-serif',
         gap: '0.5rem',
+        padding: '1rem',
       }}
     >
       <h1 style={{ letterSpacing: '0.1em' }}>AETHER VANGUARD</h1>
       <p>Stato connessione: {status}</p>
       <p>
-        Posizione (WASD/frecce): x={localPos.x.toFixed(2)}, y={localPos.y.toFixed(2)}
+        Tu (prediction): x={localPos.x.toFixed(2)}, y={localPos.y.toFixed(2)}
       </p>
+
+      <div style={{ textAlign: 'left', minWidth: 280 }}>
+        <p style={{ marginBottom: 4 }}>Altri player (interpolation):</p>
+        {Object.keys(remotePositions).length === 0 && (
+          <p style={{ opacity: 0.6 }}>— nessuno, apri un'altra tab —</p>
+        )}
+        {Object.entries(remotePositions).map(([sessionId, pos]) => (
+          <p key={sessionId} style={{ margin: 0 }}>
+            {sessionId.slice(0, 6)}: x={pos.x.toFixed(2)}, y={pos.y.toFixed(2)}
+          </p>
+        ))}
+      </div>
+
       {error && <p style={{ color: '#C0392B' }}>{error}</p>}
     </main>
   );
