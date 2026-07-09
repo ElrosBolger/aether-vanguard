@@ -23,7 +23,7 @@ export class GameNetworkClient {
   private interpolator = new RemoteEntityInterpolator();
 
   constructor(
-    private serverUrl: string,
+    serverUrl: string,
     private getInputVector: GetInputVectorFn,
     private events: NetworkClientEvents = {}
   ) {
