@@ -1,4 +1,4 @@
-import { Room, Client } from 'colyseus';
+import { Room, Client } from '@colyseus/core';
 import jwt from 'jsonwebtoken';
 import { WorldState, PlayerState } from '../schema/WorldState';
 import {

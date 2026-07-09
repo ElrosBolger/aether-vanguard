@@ -3,8 +3,6 @@
   "compilerOptions": {
     "module": "CommonJS",
     "moduleResolution": "Node",
-    "outDir": "./dist",
-    "rootDir": "./src",
     "types": ["node"],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
@@ -13,5 +11,5 @@
       "@shared/*": ["../shared/src/*"]
     }
   },
-  "include": ["src"]
+  "include": ["src", "../shared/src"]
 }

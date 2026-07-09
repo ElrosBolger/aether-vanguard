@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { createServer } from 'http';
 import express from 'express';
-import { Server } from 'colyseus';
+import { Server } from '@colyseus/core';
 import { WebSocketTransport } from '@colyseus/ws-transport';
 import { WorldRoom } from './rooms/WorldRoom';
 
